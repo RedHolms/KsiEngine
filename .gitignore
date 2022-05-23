@@ -1,0 +1,13 @@
+# Ide files
+.vscode
+
+# Build output
+*.obj
+*.exe
+*.dll
+*.lib
+*.exp
+
+lib
+bin
+include

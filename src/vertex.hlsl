@@ -1,0 +1,13 @@
+struct vs_in {
+   float3 position_local : POS;
+};
+
+struct vs_out {
+   float4 position_clip : SV_POSITION;
+};
+
+vs_out main(vs_in input) {
+   vs_out output;
+   output.position_clip = float4(input.position_local, 1.0);
+   return output;
+}

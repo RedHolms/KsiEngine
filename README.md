@@ -9,5 +9,5 @@
 Ksi Engine - is a game engine, that I created to learn more
 
 To-Do:
-   [x] - Draw with indices!
-   [ ] - 3D
+   - [X] Draw with indices!  
+   - [ ] 3D

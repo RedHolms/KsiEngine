@@ -1,7 +1,7 @@
 <h2 align="center"> Ksi Engine </h2>
 
 <div align="center">
-   [![CodeFactor](https://www.codefactor.io/repository/github/redholms/ksiengine/badge)](https://www.codefactor.io/repository/github/redholms/ksiengine)
+   <a href="https://www.codefactor.io/repository/github/redholms/ksiengine"><img src="https://www.codefactor.io/repository/github/redholms/ksiengine/badge" alt="CodeFactor" /></a>
 </div>
 
 ------------------------------------

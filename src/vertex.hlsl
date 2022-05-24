@@ -1,13 +1,17 @@
-struct vs_in {
+cbuffer BufferPerFrame : register(b0) {
+   matrix camera_matrix;
+}
+
+struct ShaderInput {
    float3 position_local : POS;
 };
 
-struct vs_out {
+struct ShaderOutput {
    float4 position_clip : SV_POSITION;
 };
 
-vs_out main(vs_in input) {
-   vs_out output;
+ShaderOutput main(ShaderInput input) {
+   ShaderOutput output;
    output.position_clip = float4(input.position_local, 1.0);
    return output;
 }

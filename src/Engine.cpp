@@ -5,7 +5,7 @@
 #include "Render.hpp"
 
 static _KSI_::Engine* _instance = nullptr;
-static _KSI_::Render::DrawObject _sampleTrinagle;
+static _KSI_::Render::DrawObject _sample_square;
 
 KSI_START
 
@@ -22,18 +22,37 @@ void Engine::Destroy() {
 Engine::Engine()
    : m_winHandle(NULL), m_renderer(nullptr)
 {
-   WNDCLASSA wc {
-      0,                      /* style */
-      _KsiWndProc,            /* lpfnWndProc */
-      0,                      /* cbClsExtra */
-      0,                      /* cbWndExtra */
-      GetModuleHandleA(NULL), /* hInstance */
-      NULL,                   /* hIcon */
-      NULL,                   /* hCursor */
-      NULL,                   /* hbrBackground */
-      NULL,                   /* lpszMenuName */
-      "KSIENG_MAINWND_CLS"    /* lpszClassName */
+   _InitWindow();
+
+   m_renderer = new Render::Renderer(m_winHandle);
+   if (!m_renderer->IsValid()) {
+      m_lastError = m_renderer->GetLastError();
+      m_valid = false;
+   }
+
+   Render::Vertex vertices[] = {
+      { -0.5f, -0.5f, 0.0f },
+      { -0.5f,  0.5f, 0.0f },
+      {  0.5f,  0.5f, 0.0f },
+      {  0.5f, -0.5f, 0.0f },
    };
+   uint16_t indices[] = {
+      0, 2, 1,
+      0, 3, 2
+   };
+   _sample_square.vertices = m_renderer->CreateVertexBuffer(vertices, _ConstArraySize(vertices));
+   _sample_square.indices = m_renderer->CreateIndexBuffer(indices, _ConstArraySize(indices));
+   _sample_square.indicesCount = _ConstArraySize(indices);
+
+   m_valid = true;
+}
+
+void Engine::_InitWindow() {
+   WNDCLASSA wc;
+   ZeroMemory(&wc, sizeof(wc));
+   wc.lpfnWndProc    = _KsiWndProc;
+   wc.hInstance      = GetModuleHandleA(NULL);
+   wc.lpszClassName  = "KSIENG_MAINWND_CLS";
 
    ATOM atom = RegisterClassA(&wc);
    if (!atom) {
@@ -59,46 +78,31 @@ Engine::Engine()
       m_valid = false;
       return;
    }
-
-   m_renderer = new Render::Renderer(m_winHandle);
-   if (!m_renderer->IsValid()) {
-      m_lastError = m_renderer->GetLastError();
-      m_valid = false;
-   }
-
-   float vertex_data_array[] = {
-      0.0f,  0.5f,  0.0f,
-      0.5f, -0.5f,  0.0f,
-      -0.5f, -0.5f,  0.0f
-   };
-   _sampleTrinagle.vertices = m_renderer->CreateVertexBuffer((Render::Vertex*)vertex_data_array, 3);
-   _sampleTrinagle.verticesCount = 3;
-
-   m_valid = true;
 }
+
 Engine::~Engine() {
-   _sampleTrinagle.vertices->Release();
+   _sample_square.vertices->Release();
    if (m_renderer)
       delete m_renderer;
 }
 
-void Engine::Update() {
-
+void Engine::_Update() {
+   return;
 }
 
-void Engine::Render() {
-   m_renderer->Render(_sampleTrinagle);
+void Engine::_Render() {
+   m_renderer->Render(_sample_square);
 }
 
-void Engine::Process() {
-   Update();
-   Render();
+void Engine::_Process() {
+   _Update();
+   _Render();
 }
 
 int Engine::Run() {
    ShowWindow(m_winHandle, SW_SHOWMAXIMIZED);
    SetWindowPos(m_winHandle, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-   
+
    MSG msg;
    ZeroMemory(&msg, sizeof(msg));
    while (true) {
@@ -109,7 +113,7 @@ int Engine::Run() {
       }
       if (msg.message == WM_QUIT) break;
 
-      Process();
+      _Process();
    }
    return msg.wParam;
 }

@@ -19,13 +19,15 @@ set KSI_LB_FLAGS=
 :: without extensions
 set KSI_SOURCES=^
    Engine ^
-   Render
+   Render ^
+   GameObject
 
 :: with extensions
 set KSI_INCLUDE=^
    KsiMain.hpp ^
    Engine.hpp ^
-   Render.hpp
+   Render.hpp ^
+   GameObject.hpp
 
 ::: End of config :::
 
@@ -51,6 +53,10 @@ if defined KSI_STATIC set KSI_CC_FLAGS=%KSI_CC_FLAGS% /DKSI_STATIC
 set KSI_CC=%KSI_CC_%%KSI_CC_FLAGS%
 set KSI_LK=%KSI_LK_%%KSI_LK_FLAGS%%KSI_LIBS%
 set KSI_LB=%KSI_LB_%%KSI_LB_FLAGS%%KSI_LIBS%
+
+rmdir /S /Q %KSI_INC_DIR%
+rmdir /S /Q %KSI_LIB_DIR%
+rmdir /S /Q %KSI_BIN_DIR%
 
 if not exist %KSI_LIB_DIR% mkdir %KSI_LIB_DIR%
 if not exist %KSI_BIN_DIR% mkdir %KSI_BIN_DIR%

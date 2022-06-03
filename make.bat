@@ -10,24 +10,25 @@ set KSI_SRC_DIR=%cd%\src
 set KSI_OBJ_DIR=%cd%\temp
 set KSI_INC_DIR=%cd%\include\ksiEngine
 
-set KSI_LIBS= User32.lib D3D11.lib
+set KSI_LIBS= User32.lib D3D11.lib d3dcompiler.lib Winmm.lib
 
-set KSI_CC_FLAGS= /DKSI_BUILD
+set KSI_CC_FLAGS= /DKSI_BUILD /O2
 set KSI_LK_FLAGS= /DLL
 set KSI_LB_FLAGS=
 
 :: without extensions
 set KSI_SOURCES=^
-   Engine ^
-   Render ^
-   GameObject
+   Allocator ^
+   Camera ^
+   GameObject ^
+   Renderer ^
+   Input ^
+   Engine
 
 :: with extensions
 set KSI_INCLUDE=^
-   KsiMain.hpp ^
-   Engine.hpp ^
-   Render.hpp ^
-   GameObject.hpp
+   *.hpp ^
+   *.inl
 
 ::: End of config :::
 
@@ -64,6 +65,8 @@ if not exist %KSI_OBJ_DIR% mkdir %KSI_OBJ_DIR%
 if not exist %KSI_INC_DIR% mkdir %KSI_INC_DIR%
 
 pushd %KSI_SRC_DIR%
+for %%f in (%KSI_INCLUDE%) do if exist %%f copy %%f %KSI_INC_DIR% > nul
+
 if not exist %KSI_OBJ_DIR%\pixel.cso   fxc /nologo /T ps_5_0 pixel.hlsl /Fo:%KSI_OBJ_DIR%\pixel.cso
 if not exist %KSI_OBJ_DIR%\vertex.cso  fxc /nologo /T vs_5_0 vertex.hlsl /Fo:%KSI_OBJ_DIR%\vertex.cso
 
@@ -92,9 +95,5 @@ if defined KSI_STATIC (
       exit /b 1
    )
 )
-
-pushd %KSI_SRC_DIR%
-for %%f in (%KSI_INCLUDE%) do copy %%f %KSI_INC_DIR% > nul
-popd
 
 endlocal

@@ -6,8 +6,11 @@
 
 ------------------------------------
 
-Ksi Engine - is a game engine, that I created to learn more
+Ksi Engine - is a game engine, that I created from scratch using DirectX 11
 
 To-Do:
    [x] - Draw with indices!
-   [ ] - 3D
+   [x] - 3D
+   [ ] - Textures
+   [ ] - Models loading from files (.obj)
+   [ ] - Ligth (software rtx??)

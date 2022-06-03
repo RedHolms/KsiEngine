@@ -1,7 +1,7 @@
-struct px_in {
-   float4 position_clip : SV_POSITION;
+struct InputData {
+   float4 color : COLOR;
 };
 
-float4 main(px_in input) : SV_TARGET {
-   return float4(1.0, 0.0, 1.0, 1.0);
+float4 main(InputData IN) : SV_TARGET {
+   return IN.color;
 }

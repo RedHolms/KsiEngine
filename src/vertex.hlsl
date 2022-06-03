@@ -1,17 +1,28 @@
-cbuffer BufferPerFrame : register(b0) {
-   matrix camera_matrix;
+cbuffer ConstantBuffer : register(b0) {
+   matrix projectionMatrix;
+   matrix viewMatrix;
 }
 
-struct ShaderInput {
-   float3 position_local : POS;
+cbuffer ObjectBuffer : register(b1) {
+   matrix objectMatrix;
+}
+
+struct InputData {
+   float3 position : POSITION;
+   float3 color: COLOR;
 };
 
-struct ShaderOutput {
-   float4 position_clip : SV_POSITION;
+struct OutputData {
+   float4 color : COLOR;
+   float4 position : SV_POSITION;
 };
 
-ShaderOutput main(ShaderInput input) {
-   ShaderOutput output;
-   output.position_clip = float4(input.position_local, 1.0);
-   return output;
+OutputData main(InputData IN) {
+   OutputData OUT;
+
+   matrix mvp = mul(mul(projectionMatrix, viewMatrix), objectMatrix);
+   OUT.position = mul(mvp, float4(IN.position, 1.0f));
+   OUT.color = float4(IN.color, 1.0f);
+
+   return OUT;
 }

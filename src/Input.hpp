@@ -33,11 +33,11 @@ public:
    bool IsKeyDown(unsigned char key) { return m_keysDown[key]; }
 
    KSI_API void Update(float);
-   KSI_API void EndOfFrame();
+   KSI_API void OnEndFrame();
    KSI_API bool WndProc(HWND windowHandle, UINT msg, WPARAM wParam, LPARAM lParam, LRESULT* lResult);
 
    // BeginOfFrame doesn't used
-   void BeginOfFrame() {}
+   void OnBeginFrame() {}
 
 private:
    KSI_API void _ProcessInput();

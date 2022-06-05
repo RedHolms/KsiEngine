@@ -9,7 +9,7 @@
 
 #include "Vector.hpp"
 
-#define DirectXAssert(expr) _DirectXAssert(expr, #expr, __FILE__, __LINE__)
+#define DirectXAssert(expr) _DirectXAssert(expr)
 
 static const uint32_t c_verticesStride[] = { sizeof(_KSI_RENDER_::Vertex) };
 static const uint32_t c_verticesOffset[] = { 0 };
@@ -20,8 +20,9 @@ Renderer::Renderer(HWND windowHandle)
    : m_windowHandle(NULL),
    m_device(nullptr), m_deviceContext(nullptr), m_swapChain(nullptr),
    m_renderTargetView(nullptr), m_depthStencilBuffer(nullptr), m_depthStencilView(nullptr),
-   m_depthStencilState(nullptr), m_rasterizerState(nullptr), m_constantBuffer(nullptr),
-   m_vertexShader(nullptr), m_pixelShader(nullptr), m_inputLayout(nullptr)
+   m_depthStencilState(nullptr), m_rasterizerState(nullptr), m_samplerState(nullptr),
+   m_constantBuffer(nullptr), m_vertexShader(nullptr), m_pixelShader(nullptr),
+   m_inputLayout(nullptr)
 {
    m_windowHandle = windowHandle;
 
@@ -129,6 +130,22 @@ Renderer::Renderer(HWND windowHandle)
       m_device->CreateRasterizerState(&rasterizerDesc, &m_rasterizerState)
    );
 
+   D3D11_SAMPLER_DESC samplerDesc;
+   _ClearStructure(samplerDesc);
+   samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+   samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
+   samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
+   samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
+   samplerDesc.BorderColor[0] = 1.0f;
+   samplerDesc.BorderColor[1] = 1.0f;
+   samplerDesc.BorderColor[2] = 1.0f;
+   samplerDesc.BorderColor[3] = 1.0f;
+   samplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+
+   DirectXAssert(
+      m_device->CreateSamplerState(&samplerDesc, &m_samplerState)
+   );
+
    _ClearStructure(m_viewport);
 
    /* Create constant buffer */
@@ -136,7 +153,7 @@ Renderer::Renderer(HWND windowHandle)
    ZeroMemory( &constantBufferDesc, sizeof(D3D11_BUFFER_DESC) );
 
    constantBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-   constantBufferDesc.ByteWidth = sizeof( ConstantBufferData );
+   constantBufferDesc.ByteWidth = sizeof(ConstantBufferData);
    constantBufferDesc.CPUAccessFlags = 0;
    constantBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 
@@ -169,7 +186,8 @@ Renderer::Renderer(HWND windowHandle)
    /* Create input layout */
    D3D11_INPUT_ELEMENT_DESC inputLayoutDesc[] = {
       { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, _MemberOffset(Vertex, pos), D3D11_INPUT_PER_VERTEX_DATA, 0 },
-      { "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, _MemberOffset(Vertex, color), D3D11_INPUT_PER_VERTEX_DATA, 0 }
+      { "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, _MemberOffset(Vertex, color), D3D11_INPUT_PER_VERTEX_DATA, 0 },
+      { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, _MemberOffset(Vertex, textureUV), D3D11_INPUT_PER_VERTEX_DATA, 0}
    };
 
    DirectXAssert(
@@ -183,46 +201,6 @@ Renderer::Renderer(HWND windowHandle)
    );
 
    _SafeRelease(vertexShaderBlob);
-
-   // D3D11_BUFFER_DESC vertexBufferDesc;
-   // D3D11_SUBRESOURCE_DATA resourceData;
-   // _ClearStructure(resourceData);
-   // ZeroMemory(&vertexBufferDesc, sizeof(D3D11_BUFFER_DESC));
-
-   // vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-   // vertexBufferDesc.ByteWidth = sizeof(_vertices);
-   // vertexBufferDesc.CPUAccessFlags = 0;
-   // vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-   // resourceData.pSysMem = _vertices;
-
-   // DirectXAssert(
-   //    m_device->CreateBuffer(&vertexBufferDesc, &resourceData, &_dro.vertices)
-   // );
-
-   // D3D11_BUFFER_DESC indexBufferDesc;
-   // ZeroMemory(&indexBufferDesc, sizeof(D3D11_BUFFER_DESC));
-
-   // indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-   // indexBufferDesc.ByteWidth = sizeof(_indices);
-   // indexBufferDesc.CPUAccessFlags = 0;
-   // indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-   // resourceData.pSysMem = _indices;
-
-   // DirectXAssert(
-   //    m_device->CreateBuffer(&indexBufferDesc, &resourceData, &_dro.indices)
-   // );
-
-   // D3D11_BUFFER_DESC objectBufferDesc;
-   // ZeroMemory(&objectBufferDesc, sizeof(D3D11_BUFFER_DESC));
-   // objectBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-   // objectBufferDesc.ByteWidth = sizeof(ObjectBufferData);
-   // objectBufferDesc.CPUAccessFlags = 0;
-   // objectBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-   // DirectXAssert(
-   //    m_device->CreateBuffer(&objectBufferDesc, nullptr, &_dro.buff)
-   // );
-
-   // _dro.indicesCount = _ConstArraySize(_indices);
 }
 
 Renderer::~Renderer() {
@@ -230,6 +208,7 @@ Renderer::~Renderer() {
    _SafeRelease(m_pixelShader);
    _SafeRelease(m_vertexShader);
    _SafeRelease(m_constantBuffer);
+   _SafeRelease(m_samplerState);
    _SafeRelease(m_rasterizerState);
    _SafeRelease(m_depthStencilState);
    _SafeRelease(m_depthStencilView);
@@ -267,14 +246,16 @@ void Renderer::Render(const DrawObject* drawObjects, size_t count) {
    m_deviceContext->RSSetState(m_rasterizerState);
    m_deviceContext->RSSetViewports(1, &m_viewport);
 
-   m_deviceContext->PSSetShader( m_pixelShader, nullptr, 0 );
+   m_deviceContext->PSSetShader(m_pixelShader, nullptr, 0);
+   m_deviceContext->PSSetSamplers(0, 1, &m_samplerState);
 
-   m_deviceContext->OMSetRenderTargets( 1, &m_renderTargetView, m_depthStencilView );
-   m_deviceContext->OMSetDepthStencilState( m_depthStencilState, 1 );
+   m_deviceContext->OMSetRenderTargets(1, &m_renderTargetView, m_depthStencilView);
+   m_deviceContext->OMSetDepthStencilState(m_depthStencilState, 1);
 
    for (size_t i = 0; i < count; i++) {
       const DrawObject& dro = drawObjects[i];
 
+      m_deviceContext->PSSetShaderResources(0, 1, &dro.textureView);
       m_deviceContext->VSSetConstantBuffers(1, 1, &dro.buff);
       m_deviceContext->IASetVertexBuffers(0, 1, &dro.vertices, c_verticesStride, c_verticesOffset);
       m_deviceContext->IASetIndexBuffer(dro.indices, DXGI_FORMAT_R16_UINT, 0);
@@ -286,7 +267,10 @@ void Renderer::Present() {
    m_swapChain->Present(1, 0);
 }
 
-void Renderer::_DirectXAssert(HRESULT hr, const char* expr, const char* file, uint32_t line) {
+KSI_RENDER_END
+
+// Defined in KsiMain.hpp
+void DirectXAssertImpl(HRESULT hr, const char* expr, const char* file, uint32_t line) {
    if (FAILED(hr)) {
       static char errorBuff[512];
       snprintf(errorBuff, _ConstArraySize(errorBuff),
@@ -304,5 +288,3 @@ void Renderer::_DirectXAssert(HRESULT hr, const char* expr, const char* file, ui
       ExitProcess(2);
    }
 }
-
-KSI_RENDER_END

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef KsiEngine_KsiMain_hpp_
+#define KsiEngine_KsiMain_hpp_
 
 #if !defined(__cplusplus)
    #error "Ksi engine is cpp-only"
@@ -16,6 +17,15 @@
    #else
       #define KSI_API __declspec(dllimport)
    #endif
+#endif
+
+#if !defined(_HRESULT_DEFINED)
+   #define _HRESULT_DEFINED
+   typedef long HRESULT;
+#endif
+
+#if !defined(STB_IMAGE_IMPLEMENTATION)
+   #define STB_IMAGE_IMPLEMENTATION
 #endif
 
 #define _KSI KsiEngine
@@ -72,6 +82,8 @@ struct is_pointer {
 #include <string.h>
 #include <assert.h>
 
+KSI_API void DirectXAssertImpl(HRESULT hr, const char* expr, const char* file, uint32_t line);
+
 /* some utils */
 #define _ConstArraySize(p) (sizeof(p)/sizeof(*p))
 #define _ClearMemory(p, s) memset(p, 0, s)
@@ -88,3 +100,8 @@ struct is_pointer {
 #define _UnpackVec2(v) v.x, v.y
 #define _UnpackVec3(v) v.x, v.y, v.z
 #define _UnpackVec4(v) v.x, v.y, v.z, v.w
+#define _GetFPS(dt) (1.0f/dt)
+#define _GetDeltaTime(fps) (1.0f/fps)
+#define _DirectXAssert(expr) DirectXAssertImpl(expr, #expr, __FILE__, __LINE__)
+
+#endif // KsiEngine_KsiMain_hpp_

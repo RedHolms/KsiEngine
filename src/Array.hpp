@@ -22,15 +22,28 @@ public:
       _realloc();
    }
 
-   Array(const _Ty* items, size_t count, size_t res = count + 10)
-      : m_items(nullptr), m_reserved(res), m_count(count)
+   Array(const _Ty* items, size_t count, size_t res = -1)
+      : m_items(nullptr), m_reserved(res == -1 ? count + 10 : res), m_count(count)
    {
       _realloc();
       memcpy(m_items, items, count * sizeof(_Ty));
    }
 
+   Array(const Array& other) {
+      operator=(other);
+   }
+
    ~Array() {
       _free();
+   }
+
+   const Array& operator=(const Array& other) {
+      m_items = nullptr;
+      m_reserved = other.m_reserved;
+      m_count = other.m_count;
+      _realloc();
+      memcpy(m_items, other.m_items, other.m_count * sizeof(_Ty));
+      return other;
    }
 
 private:
@@ -49,7 +62,7 @@ public:
          _realloc();
       }
 
-      memcpy(m_items + m_count, items, count * sizeof(_Ty));
+      memcpy(end(), items, count * sizeof(_Ty));
       m_count += count;
    }
    void pop_back(size_t count = 1) {
@@ -59,10 +72,14 @@ public:
       m_count = 0;
    }
 
+   _Ty* begin() { return m_items; }
+   _Ty* end() { return m_items + m_count; }
+
    size_t count() { return m_count; }
    _Ty* data() { return m_items; }
 
    _Ty& operator[](size_t idx) { return m_items[idx]; }
+
 private:
    void _free() {
       if (m_items)

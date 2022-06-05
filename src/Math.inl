@@ -43,10 +43,10 @@ inline Vector3 Vector3Cross(const Vector3& a, const Vector3& b) {
 
 inline Vector3 EulerNormalize(const Vector3& rot) {
    Vector3 result(rot);
-   // We can't get mod, because it's a float
-   while (result.x >= 360.0f) result.x -= 360.0f;
-   while (result.y >= 360.0f) result.y -= 360.0f;
-   while (result.z >= 360.0f) result.z -= 360.0f;
+   // We can't get mod because it's a float
+   while (result.x >= 360.0f) result.x -= 360.0f; while (result.x <= -360.0f) result.x += 360.0f;
+   while (result.y >= 360.0f) result.y -= 360.0f; while (result.y <= -360.0f) result.y += 360.0f;
+   while (result.z >= 360.0f) result.z -= 360.0f; while (result.z <= -360.0f) result.z += 360.0f;
    return result;
 }
 

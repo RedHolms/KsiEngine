@@ -1,4 +1,4 @@
-# Ide files
+# IDE config
 .vscode
 
 # Build output
@@ -9,7 +9,10 @@
 *.exp
 *.cso
 
+# Output folders
 lib
 bin
-temp
 include
+
+# Temperal folder
+temp

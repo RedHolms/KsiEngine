@@ -6,7 +6,6 @@
 KSI_START
 
 enum VKey : uint8_t {
-
    KSIVKEY_LBUTTON           = 0x01,
    KSIVKEY_RBUTTON           = 0x02,
    KSIVKEY_CANCEL            = 0x03,

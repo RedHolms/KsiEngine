@@ -13,6 +13,7 @@ KSI_RENDER_START
 struct Vertex {
    Vector3 pos;
    Vector3 color;
+   Vector2 textureUV;
 };
 
 struct DrawObject {
@@ -20,6 +21,7 @@ struct DrawObject {
    ID3D11Buffer* indices;
    size_t indicesCount;
    ID3D11Buffer* buff;
+   ID3D11ShaderResourceView* textureView;
 };
 
 struct ConstantBufferData {
@@ -29,6 +31,7 @@ struct ConstantBufferData {
 
 struct ObjectBufferData {
    DirectX::XMMATRIX objectMatrix;
+   DirectX::XMVECTOR position;
 };
 
 class Renderer {
@@ -49,6 +52,7 @@ private:
    ID3D11DepthStencilView* m_depthStencilView;
    ID3D11DepthStencilState* m_depthStencilState;
    ID3D11RasterizerState* m_rasterizerState;
+   ID3D11SamplerState* m_samplerState;
 
    ID3D11Buffer* m_constantBuffer;
    ID3D11VertexShader* m_vertexShader;
@@ -65,9 +69,6 @@ public:
 
    KSI_API void Render(const DrawObject* drawObjects, size_t count);
    KSI_API void Present();
-
-private:
-   KSI_API void _DirectXAssert(HRESULT hr, const char* expr, const char* file, uint32_t line);
 };
 
 KSI_RENDER_END

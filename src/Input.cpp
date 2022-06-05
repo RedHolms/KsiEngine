@@ -58,7 +58,7 @@ void Input::Update(float) {
    );
 }
 
-void Input::EndOfFrame() {
+void Input::OnEndFrame() {
    memset(m_keysPressed, 0, sizeof(m_keysPressed));
    m_mouseMove = Vector2();
 

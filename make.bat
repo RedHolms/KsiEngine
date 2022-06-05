@@ -20,9 +20,11 @@ set KSI_LB_FLAGS=
 set KSI_SOURCES=^
    Allocator ^
    Camera ^
+   Mesh ^
    GameObject ^
    Renderer ^
    Input ^
+   Texture ^
    Engine
 
 :: with extensions

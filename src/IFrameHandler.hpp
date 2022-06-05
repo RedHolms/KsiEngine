@@ -7,11 +7,11 @@ KsiInterface IFrameHandler {
 KsiInterface_begin
 
    KsiInterface_method_
-      void BeginOfFrame()
+      void OnBeginFrame()
    _KsiInterface_method;
 
    KsiInterface_method_
-      void EndOfFrame()
+      void OnEndFrame()
    _KsiInterface_method;
 };
 

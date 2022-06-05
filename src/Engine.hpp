@@ -10,6 +10,7 @@
 #include "Camera.hpp"
 #include "Array.hpp"
 #include "Input.hpp"
+#include "Mesh.hpp"
 
 KSI_START
 
@@ -47,8 +48,7 @@ public:
 
    float GetDeltaTime() { return m_deltaTime; }
 
-   KSI_API GameObject* CreateGameObject(const Vector3& position, const Vector3& rotation);
-   KSI_API void InsertGameObject(GameObject* obj);
+   KSI_API void AddGameObject(GameObject* obj);
 
    KSI_API void AddScript(GameScript* scr);
 

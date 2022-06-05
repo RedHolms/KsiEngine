@@ -10,6 +10,12 @@
 
 static _KSI_::Engine* _instance = nullptr;
 
+#define _RaiseStart(scripts) for (auto& scr : scripts) scr->OnStart()
+#define _RaiseDestroy(scripts) for (auto& scr : scripts) scr->OnDestroy()
+#define _RaiseUpdate(dt, input, scripts) input->Update(dt); for (auto& scr : scripts) scr->OnUpdate(dt)
+#define _RaiseBeginFrame(input, scripts) input->OnBeginFrame(); for (auto& scr : scripts) scr->OnBeginFrame()
+#define _RaiseEndFrame(input, scripts) for (auto& scr : scripts) scr->OnEndFrame(); input->OnEndFrame()
+
 KSI_START
 
 Engine& Engine::Get() {
@@ -37,10 +43,8 @@ Engine::Engine()
 }
 
 Engine::~Engine() {
-   for (size_t i = 0; i < m_scripts.count(); i++) {
-      m_scripts[i]->OnDestroy();
-      delete m_scripts[i];
-   }
+   _RaiseDestroy(m_scripts);
+   for (auto& scr : m_scripts) delete scr;
    m_scripts.clear();
 
    _SafeDelete(m_input);
@@ -48,13 +52,7 @@ Engine::~Engine() {
    _SafeDelete(m_renderer);
 }
 
-GameObject* Engine::CreateGameObject(const Vector3& position, const Vector3& rotation) {
-   GameObject* obj = new GameObject(position, rotation);
-   m_objects.push_back(obj);
-   return obj;
-}
-
-void Engine::InsertGameObject(GameObject* obj) {
+void Engine::AddGameObject(GameObject* obj) {
    m_objects.push_back(obj);
 }
 
@@ -63,8 +61,7 @@ void Engine::AddScript(GameScript* scr) {
 }
 
 int Engine::Run() {
-   for (size_t i = 0; i < m_scripts.count(); i++)
-      m_scripts[i]->OnStart();
+   _RaiseStart(m_scripts);
 
    ShowWindow(m_winHandle, SW_SHOWMAXIMIZED);
    ShowCursor(FALSE);
@@ -120,9 +117,7 @@ void Engine::_Process() {
 }
 
 void Engine::_Update() {
-   m_input->Update(m_deltaTime);
-   for (size_t i = 0; i < m_scripts.count(); i++)
-      m_scripts[i]->OnUpdate(m_deltaTime);
+   _RaiseUpdate(m_deltaTime, m_input, m_scripts);
 }
 
 void Engine::_Render() {
@@ -130,9 +125,8 @@ void Engine::_Render() {
    GetClientRect(m_winHandle, &clientRect);
 
    Array<_KSI_RENDER_::DrawObject> toDraw(m_objects.count());
-   for (size_t i = 0; i < m_objects.count(); i++) {
-      toDraw.push_back(m_objects[i]->GetDrawObject());
-   }
+   for (auto& gObj : m_objects)
+      toDraw.push_back(gObj->GetDrawObject());
 
    float clientWidth = (float)_RectWidth(clientRect);
    float clientHeight = (float)_RectHeight(clientRect);
@@ -141,15 +135,9 @@ void Engine::_Render() {
    m_constantRenderData.viewMatrix = m_camera->GetViewMatrix();
    m_renderer->UpdateConstantBuffer(&m_constantRenderData);
 
-   for (size_t i = 0; i < m_scripts.count(); i++)
-      m_scripts[i]->OnBeginFrame();
-
+   _RaiseBeginFrame(m_input, m_scripts);
    m_renderer->Render(toDraw.data(), toDraw.count());
-
-   for (size_t i = 0; i < m_scripts.count(); i++)
-      m_scripts[i]->OnEndFrame();
-   m_input->EndOfFrame();
-
+   _RaiseEndFrame(m_input, m_scripts);
    m_renderer->Present();
 }
 

@@ -43,18 +43,6 @@ DirectX::XMMATRIX Camera::GetViewMatrix() {
          ),
          DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f)
       );
-      // DirectX::XMMatrixLookToLH(
-      //    DirectX::XMVectorSet(m_position.x, m_position.y, m_position.z, 0.0f),
-      //    DirectX::XMVector3Rotate(
-      //       DirectX::XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f),
-      //       DirectX::XMQuaternionRotationRollPitchYaw(
-      //          DirectX::XMConvertToRadians(m_rotation.x),
-      //          DirectX::XMConvertToRadians(m_rotation.y),
-      //          DirectX::XMConvertToRadians(m_rotation.z)
-      //       )
-      //    ),
-      //    DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f)
-      // );
 }
 
 KSI_END

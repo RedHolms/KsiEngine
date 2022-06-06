@@ -39,7 +39,6 @@ const _KSI_RENDER_::DrawObject& GameObject::GetDrawObject() {
    _KSI_RENDER_::ObjectBufferData objData;
    objData.position = DirectX::XMVectorSet(m_position.x, m_position.y, m_position.z, 0.0f);
    objData.objectMatrix =
-      // DirectX::XMMatrixTranslation(m_position.x, m_position.y, m_position.z) *
       DirectX::XMMatrixRotationRollPitchYaw(
          DirectX::XMConvertToRadians(m_rotation.x),
          DirectX::XMConvertToRadians(m_rotation.y),

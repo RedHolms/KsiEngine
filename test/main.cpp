@@ -24,7 +24,8 @@ public:
       KsiEngine::Texture texture = KsiEngine::Texture::CreateFromFile("testTexture.png");
 
       // m_plate = new KsiEngine::GameObject(KsiEngine::Mesh::PLATE(20, 20), texture, KsiEngine::Vector3(0.0f, 0.0f, 0.0f), KsiEngine::Vector3(0.0f, 0.0f, 0.0f));
-      m_cube = new KsiEngine::GameObject(KsiEngine::Mesh::CreateFromObject("cube.obj"), texture, KsiEngine::Vector3(0.0f, 5.0f, 0.0f), KsiEngine::Vector3(0.0f, 0.0f, 0.0f));
+      
+      m_cube = new KsiEngine::GameObject(KsiEngine::Mesh::CreateFromFile("cube.obj"), texture, KsiEngine::Vector3(0.0f, 5.0f, 0.0f), KsiEngine::Vector3(0.0f, 0.0f, 0.0f));
 
       // eng.AddGameObject(m_plate);
       eng.AddGameObject(m_cube);
@@ -46,7 +47,7 @@ public:
       KsiEngine::Vector3 cameraMove;
       KsiEngine::Vector3 cameraRot = KsiEngine::Vector3(0.0f, mouseMoveVec.x, -mouseMoveVec.y);
 
-      // m_cube->GetRotation() += KsiEngine::Vector3(80.0f * deltaTime, 80.0f * deltaTime, 80.0f * deltaTime);
+      m_cube->GetRotation() += KsiEngine::Vector3(80.0f * deltaTime, 80.0f * deltaTime, 80.0f * deltaTime);
       
       if (input->IsKeyDown('W'))
          cameraMove += cameraForward * CameraMoveSpeed * deltaTime;

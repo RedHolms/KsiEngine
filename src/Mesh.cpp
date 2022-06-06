@@ -58,6 +58,16 @@ void Mesh::UpdateBuffers() {
    m_indicesCount = m_rawIndices.count();
 }
 
+void Mesh::Scale(float scaler) {
+   for (auto& vertex : m_rawVertices)
+      vertex.pos *= scaler;
+}
+
+void Mesh::Move(const Vector3& offset) {
+   for (auto& vertex : m_rawVertices)
+      vertex.pos += offset;
+}
+
 const Mesh& Mesh::operator=(const Mesh& other) {
    m_rawVertices = other.m_rawVertices;
    m_rawIndices = other.m_rawIndices;
@@ -70,36 +80,40 @@ Mesh Mesh::BOX(int sideSize) {
    float half = sideSize / 2.0f;
    static const _KSI_RENDER_::Vertex _vertices[] = {
       // right side
-      { _KSI_::Vector3(-half,  half,  half), _KSI_::Vector3(0.0f, 0.0f, 1.0f), _KSI_::Vector2(0.0f, 0.0f) }, // 0
-      { _KSI_::Vector3(-half, -half,  half), _KSI_::Vector3(0.0f, 0.0f, 1.0f), _KSI_::Vector2(0.0f, 1.0f) }, // 1
-      { _KSI_::Vector3( half,  half,  half), _KSI_::Vector3(0.0f, 0.0f, 1.0f), _KSI_::Vector2(1.0f, 1.0f) }, // 2
-      { _KSI_::Vector3( half, -half,  half), _KSI_::Vector3(0.0f, 0.0f, 1.0f), _KSI_::Vector2(1.0f, 0.0f) }, // 3
+      { Vector3(-half,  half,  half), Vector3(0.0f, 0.0f, 1.0f), Vector2(0.0f, 0.0f) }, // 0
+      { Vector3(-half, -half,  half), Vector3(0.0f, 0.0f, 1.0f), Vector2(0.0f, 1.0f) }, // 1
+      { Vector3( half,  half,  half), Vector3(0.0f, 0.0f, 1.0f), Vector2(1.0f, 1.0f) }, // 2
+      { Vector3( half, -half,  half), Vector3(0.0f, 0.0f, 1.0f), Vector2(1.0f, 0.0f) }, // 3
 
       // back side
-      { _KSI_::Vector3( half,  half,  half), _KSI_::Vector3(1.0f, 0.0f, 0.0f), _KSI_::Vector2(0.0f, 0.0f) }, // 4
-      { _KSI_::Vector3( half, -half,  half), _KSI_::Vector3(1.0f, 0.0f, 0.0f), _KSI_::Vector2(0.0f, 1.0f) }, // 5
-      { _KSI_::Vector3( half,  half, -half), _KSI_::Vector3(1.0f, 0.0f, 0.0f), _KSI_::Vector2(1.0f, 1.0f) }, // 6
-      { _KSI_::Vector3( half, -half, -half), _KSI_::Vector3(1.0f, 0.0f, 0.0f), _KSI_::Vector2(1.0f, 0.0f) }, // 7
+      { Vector3( half,  half,  half), Vector3(1.0f, 0.0f, 0.0f), Vector2(0.0f, 0.0f) }, // 4
+      { Vector3( half, -half,  half), Vector3(1.0f, 0.0f, 0.0f), Vector2(0.0f, 1.0f) }, // 5
+      { Vector3( half,  half, -half), Vector3(1.0f, 0.0f, 0.0f), Vector2(1.0f, 1.0f) }, // 6
+      { Vector3( half, -half, -half), Vector3(1.0f, 0.0f, 0.0f), Vector2(1.0f, 0.0f) }, // 7
 
       // left side
-      { _KSI_::Vector3( half,  half, -half), _KSI_::Vector3(0.0f, 0.0f, -1.0f), _KSI_::Vector2(0.0f, 0.0f) }, // 8
-      { _KSI_::Vector3( half, -half, -half), _KSI_::Vector3(0.0f, 0.0f, -1.0f), _KSI_::Vector2(0.0f, 1.0f) }, // 9
-      { _KSI_::Vector3(-half,  half, -half), _KSI_::Vector3(0.0f, 0.0f, -1.0f), _KSI_::Vector2(1.0f, 1.0f) }, // 10
-      { _KSI_::Vector3(-half, -half, -half), _KSI_::Vector3(0.0f, 0.0f, -1.0f), _KSI_::Vector2(1.0f, 0.0f) }, // 11
+      { Vector3( half,  half, -half), Vector3(0.0f, 0.0f, -1.0f), Vector2(0.0f, 0.0f) }, // 8
+      { Vector3( half, -half, -half), Vector3(0.0f, 0.0f, -1.0f), Vector2(0.0f, 1.0f) }, // 9
+      { Vector3(-half,  half, -half), Vector3(0.0f, 0.0f, -1.0f), Vector2(1.0f, 1.0f) }, // 10
+      { Vector3(-half, -half, -half), Vector3(0.0f, 0.0f, -1.0f), Vector2(1.0f, 0.0f) }, // 11
 
       // front side
-      { _KSI_::Vector3(-half,  half, -half), _KSI_::Vector3(-1.0f, 0.0f, 0.0f), _KSI_::Vector2(0.0f, 0.0f) }, // 12
-      { _KSI_::Vector3(-half, -half, -half), _KSI_::Vector3(-1.0f, 0.0f, 0.0f), _KSI_::Vector2(0.0f, 1.0f) }, // 13
-      { _KSI_::Vector3(-half,  half,  half), _KSI_::Vector3(-1.0f, 0.0f, 0.0f), _KSI_::Vector2(1.0f, 1.0f) }, // 14
-      { _KSI_::Vector3(-half, -half,  half), _KSI_::Vector3(-1.0f, 0.0f, 0.0f), _KSI_::Vector2(1.0f, 0.0f) }, // 15
+      { Vector3(-half,  half, -half), Vector3(-1.0f, 0.0f, 0.0f), Vector2(0.0f, 0.0f) }, // 12
+      { Vector3(-half, -half, -half), Vector3(-1.0f, 0.0f, 0.0f), Vector2(0.0f, 1.0f) }, // 13
+      { Vector3(-half,  half,  half), Vector3(-1.0f, 0.0f, 0.0f), Vector2(1.0f, 1.0f) }, // 14
+      { Vector3(-half, -half,  half), Vector3(-1.0f, 0.0f, 0.0f), Vector2(1.0f, 0.0f) }, // 15
 
       // top side
-      { _KSI_::Vector3(-half,  half, -half), _KSI_::Vector3(-1.0f, 0.0f, 0.0f), _KSI_::Vector2(0.0f, 1.0f) }, // 16
-      { _KSI_::Vector3(-half,  half,  half), _KSI_::Vector3(-1.0f, 0.0f, 0.0f), _KSI_::Vector2(1.0f, 1.0f) }, // 17
+      { Vector3(-half,  half, -half), Vector3(0.0f, 1.0f, 0.0f), Vector2(0.0f, 1.0f) }, // 16
+      { Vector3(-half,  half,  half), Vector3(0.0f, 1.0f, 0.0f), Vector2(1.0f, 1.0f) }, // 17
+      { Vector3( half,  half, -half), Vector3(0.0f, 1.0f, 0.0f), Vector2(0.0f, 0.0f) }, // 18
+      { Vector3( half,  half,  half), Vector3(0.0f, 1.0f, 0.0f), Vector2(1.0f, 1.0f) }, // 19
 
       // bottom side
-      { _KSI_::Vector3( half, -half,  half), _KSI_::Vector3(1.0f, 0.0f, 0.0f), _KSI_::Vector2(1.0f, 1.0f) }, // 18
-      { _KSI_::Vector3( half, -half, -half), _KSI_::Vector3(1.0f, 0.0f, 0.0f), _KSI_::Vector2(0.0f, 1.0f) }, // 19
+      { Vector3( half, -half,  half), Vector3(0.0f, -1.0f, 0.0f), Vector2(1.0f, 1.0f) }, // 20
+      { Vector3( half, -half, -half), Vector3(0.0f, -1.0f, 0.0f), Vector2(0.0f, 1.0f) }, // 21
+      { Vector3(-half, -half, -half), Vector3(0.0f, -1.0f, 0.0f), Vector2(1.0f, 0.0f) }, // 22
+      { Vector3(-half, -half,  half), Vector3(0.0f, -1.0f, 0.0f), Vector2(0.0f, 1.0f) }, // 23
    };
    static const uint16_t _indices[] = {
       // right side
@@ -119,12 +133,12 @@ Mesh Mesh::BOX(int sideSize) {
       15, 14, 13,
 
       // top side
-      8, 16, 2,
-      17, 2, 16,
+      18, 16, 19,
+      17, 19, 16,
 
       // bottom side
-      18, 1, 19,
-      11, 19, 1
+      20, 23, 21,
+      22, 21, 23
    };
    return Mesh(
       _vertices,
@@ -139,10 +153,10 @@ Mesh Mesh::PLATE(int width, int length) {
    float halfw = width / 2.0f;
    float halfl = length / 2.0f;
    static const _KSI_RENDER_::Vertex _vertices[] = {
-      { _KSI_::Vector3(-halfw, 0,  halfl), _KSI_::Vector3(0.0f, 1.0f, 0.0f), _KSI_::Vector2(0.0f, 0.0f) },
-      { _KSI_::Vector3( halfw, 0, -halfl), _KSI_::Vector3(0.0f, 1.0f, 0.0f), _KSI_::Vector2(0.0f, 0.0f) },
-      { _KSI_::Vector3(-halfw, 0, -halfl), _KSI_::Vector3(0.0f, 1.0f, 0.0f), _KSI_::Vector2(1.0f, 0.0f) },
-      { _KSI_::Vector3( halfw, 0,  halfl), _KSI_::Vector3(0.0f, 1.0f, 0.0f), _KSI_::Vector2(0.0f, 1.0f) }
+      { Vector3(-halfw, 0,  halfl), Vector3(0.0f, 1.0f, 0.0f), Vector2(0.0f, 0.0f) },
+      { Vector3( halfw, 0, -halfl), Vector3(0.0f, 1.0f, 0.0f), Vector2(0.0f, 0.0f) },
+      { Vector3(-halfw, 0, -halfl), Vector3(0.0f, 1.0f, 0.0f), Vector2(1.0f, 0.0f) },
+      { Vector3( halfw, 0,  halfl), Vector3(0.0f, 1.0f, 0.0f), Vector2(0.0f, 1.0f) }
    };
    static const uint16_t _indices[] = {
       0, 1, 2,
@@ -157,7 +171,7 @@ Mesh Mesh::PLATE(int width, int length) {
 }
 
 /* static */
-Mesh Mesh::CreateFromObject(const char* filename) {
+Mesh Mesh::CreateFromFile(const char* filename) {
    _KSI_NC_::ObjReaderResult r = _KSI_NC_::ObjRead(filename);
    Array<_KSI_RENDER_::Vertex> vertices;
    Array<uint16_t> indices;

@@ -4,6 +4,7 @@
 #include <d3d11.h>
 
 #include "Renderer.hpp"
+#include "Vector.hpp"
 #include "Array.hpp"
 
 KSI_START
@@ -14,7 +15,7 @@ public:
    Mesh(const Mesh& other) : m_vertices(nullptr), m_indices(nullptr) { operator=(other); }
    KSI_API ~Mesh();
 
-   static KSI_API Mesh CreateFromObject(const char* filename);
+   static KSI_API Mesh CreateFromFile(const char* filename);
 
    static KSI_API Mesh BOX(int sideSize);
    static KSI_API Mesh PLATE(int width, int length);
@@ -28,6 +29,9 @@ private:
 
 public:
    KSI_API void UpdateBuffers();
+
+   KSI_API void Scale(float scaler);
+   KSI_API void Move(const Vector3& offset);
 
    ID3D11Buffer* GetVertices() { return m_vertices; }
    ID3D11Buffer* GetIndices() { return m_indices; }

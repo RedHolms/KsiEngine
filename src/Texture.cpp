@@ -41,6 +41,7 @@ void Texture::UpdateTexture() {
    textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 
    D3D11_SUBRESOURCE_DATA textureSubresourceData;
+   _ClearStructure(textureSubresourceData);
    textureSubresourceData.pSysMem = m_data;
    textureSubresourceData.SysMemPitch = m_bytesPerRow;
 
@@ -54,8 +55,7 @@ void Texture::UpdateTexture() {
 }
 
 void Texture::operator=(const Texture& other) {
-   m_data = new char[other.m_height * other.m_bytesPerRow];
-   memcpy(m_data, other.m_data, other.m_height * other.m_bytesPerRow);
+   m_data = other.m_data;
    m_width = other.m_width;
    m_height = other.m_height;
    m_bytesPerRow = other.m_bytesPerRow;
@@ -70,8 +70,7 @@ Texture Texture::CreateFromFile(const char* filename, uint32_t forceChannelsNumb
    void* textureData = stbi_load(filename, &width, &height, &channelsNumber, forceChannelsNumber);
    assert(textureData != nullptr && "Can't load texture. Does file exist?");
 
-   Texture texture(width, height, textureData, channelsNumber * width);
-   return texture;
+   return Texture(width, height, textureData, channelsNumber * width);
 }
 
 KSI_END

@@ -63,11 +63,6 @@ void Input::Update(float) {
 void Input::OnEndFrame() {
    memset(m_keysPressed, 0, sizeof(m_keysPressed));
    m_mouseMove = Vector2();
-
-   // m_lastMousePos = Vector2(
-   //    windowRect.left + (_RectWidth(windowRect) / 2),
-   //    windowRect.top + (_RectHeight(windowRect) / 2)
-   // );
 }
 
 bool Input::WndProc(HWND windowHandle, UINT msg, WPARAM wParam, LPARAM lParam, LRESULT* lResult) {   

@@ -229,7 +229,7 @@ void Renderer::Render(const DrawObject* drawObjects, size_t count) {
    GetClientRect(m_windowHandle, &clientRect);
 
    m_deviceContext->ClearRenderTargetView(m_renderTargetView, DirectX::Colors::SkyBlue);
-   m_deviceContext->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+   m_deviceContext->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
    m_deviceContext->IASetInputLayout(m_inputLayout);
    m_deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);

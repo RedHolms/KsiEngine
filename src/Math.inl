@@ -59,3 +59,69 @@ inline Vector3 MatrixGetForwardVector(const DirectX::XMMATRIX& M) {
 }
 
 KSI_MATH_END
+
+inline _KSI_::Vector2 operator-(const _KSI_::Vector2& a, const _KSI_::Vector2& b) {
+   return _KSI_::Vector2(
+      a.x - b.x,
+      a.y - b.y
+   );
+}
+
+inline _KSI_::Vector2 operator*(const _KSI_::Vector2& vec, float scaler) {
+   return _KSI_::Vector2(
+      vec.x * scaler,
+      vec.y * scaler
+   );
+}
+
+inline _KSI_::Vector2 operator/(const _KSI_::Vector2& vec, float scaler) {
+   return _KSI_::Vector2(
+      vec.x / scaler,
+      vec.y / scaler
+   );
+}
+
+inline _KSI_::Vector3 operator-(const _KSI_::Vector3& vec) {
+   return _KSI_::Vector3(
+      -vec.x,
+      -vec.y,
+      -vec.z
+   );
+}
+
+inline _KSI_::Vector3& operator+=(_KSI_::Vector3& a, const _KSI_::Vector3& b) {
+   a.x += b.x;
+   a.y += b.y;
+   a.z += b.z;
+   return a;
+}
+
+inline _KSI_::Vector3& operator-=(_KSI_::Vector3& a, const _KSI_::Vector3& b) {
+   a.x -= b.x;
+   a.y -= b.y;
+   a.z -= b.z;
+   return a;
+}
+
+inline _KSI_::Vector3 operator*(const _KSI_::Vector3& vec, float scaler) {
+   return _KSI_::Vector3(
+      vec.x * scaler,
+      vec.y * scaler,
+      vec.z * scaler
+   );
+}
+
+inline _KSI_::Vector3& operator*=(_KSI_::Vector3& vec, float scaler) {
+   vec.x *= scaler;
+   vec.y *= scaler;
+   vec.z *= scaler;
+   return vec;
+}
+
+inline _KSI_::Vector3 operator/(const _KSI_::Vector3& vec, float scaler) {
+   return _KSI_::Vector3(
+      vec.x / scaler,
+      vec.y / scaler,
+      vec.z / scaler
+   );
+}

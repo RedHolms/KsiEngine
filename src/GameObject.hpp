@@ -5,6 +5,7 @@
 #include "Texture.hpp"
 #include "Vector.hpp"
 #include "Mesh.hpp"
+#include "Math.hpp"
 
 KSI_START
 
@@ -21,7 +22,17 @@ private:
    _KSI_RENDER_::DrawObject m_dro;
 
 public:
-   Vector3& GetRotation() { return m_rotation; }
+   Vector3& GetRotation()                          { return m_rotation; }
+   void     SetRotation(const Vector3& rotation)   { m_rotation = _KSI_MATH_::EulerNormalize(rotation); }
+
+   Vector3& GetPosition()                          { return m_position; }
+   void     SetPosition(const Vector3& position)   { m_position = position; }
+
+   Texture& GetTexture()                           { return m_texture; }
+   void     SetTexture(const Texture& texture)     { m_texture = texture; }
+
+   Mesh&    GetMesh()                              { return m_mesh; }
+   void     SetMesh(const Mesh& mesh)              { m_mesh = mesh; }
 
    KSI_API const _KSI_RENDER_::DrawObject& GetDrawObject();
 };

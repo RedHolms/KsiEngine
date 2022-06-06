@@ -152,11 +152,6 @@ LRESULT WINAPI Engine::_WndProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lPa
          PostQuitMessage(0);
          return 0;
       }
-      case WM_SIZE: {
-         // if (_instance && _instance->m_renderer)
-         //    _instance->m_renderer->PerformResize();
-         return 0;
-      }
    }
 
    if (_instance) {

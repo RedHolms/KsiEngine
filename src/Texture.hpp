@@ -7,7 +7,7 @@ KSI_START
 
 class Texture {
 public:
-   KSI_API Texture(uint32_t width, uint32_t height, const void* data, size_t bytesPerRow);
+   KSI_API Texture(uint32_t width, uint32_t height, void* data, size_t bytesPerRow);
    Texture(const Texture& other) : m_rawTexture(nullptr), m_textureView(nullptr) { operator=(other); }
    KSI_API ~Texture();
 
@@ -26,7 +26,7 @@ public:
    ID3D11Texture2D* GetRawTexture() { return m_rawTexture; }
    ID3D11ShaderResourceView* GetTextureView() { return m_textureView; }
 
-   KSI_API const Texture& operator=(const Texture& other);
+   KSI_API void operator=(const Texture& other);
 };
 
 KSI_END

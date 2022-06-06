@@ -1,4 +1,4 @@
-cbuffer ConstantBuffer : register(b0) {
+cbuffer FrameBuffer : register(b0) {
    matrix projectionMatrix;
    matrix viewMatrix;
 }
@@ -10,13 +10,12 @@ cbuffer ObjectBuffer : register(b1) {
 
 struct InputData {
    float3 position : POSITION;
-   float3 color: COLOR;
+   float3 norm : NORMAL;
    float2 uv : TEXCOORD;
 };
 
 struct OutputData {
    float4 position : SV_POSITION;
-   float4 color : COLOR;
    float2 uv : TEXCOORD;
 };
 
@@ -29,7 +28,6 @@ OutputData main(InputData IN) {
    rotatedPosition += float4(objectPosition.xyz, 0);
 
    OUT.position = mul(mvp, rotatedPosition);
-   OUT.color = float4(IN.color, 0.0);
    OUT.uv = IN.uv;
 
    return OUT;

@@ -24,7 +24,7 @@ public:
       KsiEngine::Texture texture = KsiEngine::Texture::CreateFromFile("testTexture.png");
 
       // m_plate = new KsiEngine::GameObject(KsiEngine::Mesh::PLATE(20, 20), texture, KsiEngine::Vector3(0.0f, 0.0f, 0.0f), KsiEngine::Vector3(0.0f, 0.0f, 0.0f));
-      m_cube = new KsiEngine::GameObject(KsiEngine::Mesh::BOX(2), texture, KsiEngine::Vector3(0.0f, 5.0f, 0.0f), KsiEngine::Vector3(0.0f, 0.0f, 0.0f));
+      m_cube = new KsiEngine::GameObject(KsiEngine::Mesh::CreateFromObject("cube.obj"), texture, KsiEngine::Vector3(0.0f, 5.0f, 0.0f), KsiEngine::Vector3(0.0f, 0.0f, 0.0f));
 
       // eng.AddGameObject(m_plate);
       eng.AddGameObject(m_cube);

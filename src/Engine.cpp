@@ -52,6 +52,10 @@ Engine::~Engine() {
    _SafeDelete(m_renderer);
 }
 
+bool Engine::IsWindowSelected() {
+   return GetForegroundWindow() == m_winHandle;
+}
+
 void Engine::AddGameObject(GameObject* obj) {
    m_objects.push_back(obj);
 }

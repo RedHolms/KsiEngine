@@ -11,8 +11,10 @@ KSI_START
 class Mesh {
 public:
    KSI_API Mesh(const _KSI_RENDER_::Vertex* vertices, size_t verticesCount, const uint16_t* indices, size_t indicesCount);
-   Mesh(const Mesh& other) { operator=(other); }
+   Mesh(const Mesh& other) : m_vertices(nullptr), m_indices(nullptr) { operator=(other); }
    KSI_API ~Mesh();
+
+   static KSI_API Mesh CreateFromObject(const char* filename);
 
    static KSI_API Mesh BOX(int sideSize);
    static KSI_API Mesh PLATE(int width, int length);

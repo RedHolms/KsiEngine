@@ -13,5 +13,5 @@ To-Do:
    - [X] 3D
    - [ ] Textures
    - [ ] Phisycs
-   - [ ] Models loading from files (.obj)
+   - [X] Models loading from files (.obj)
    - [ ] Ligth (software rtx??)

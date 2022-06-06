@@ -1,7 +1,6 @@
 #include "Input.hpp"
 
-#include <stdio.h>
-
+#include "Engine.hpp"
 #include "Vector.hpp"
 #include "Math.hpp"
 
@@ -50,6 +49,9 @@ float Input::GetMouseMoveForce() {
 }
 
 void Input::Update(float) {
+   if (!Engine::Get().IsWindowSelected())
+      return;
+
    RECT windowRect;
    GetWindowRect(m_windowHandle, &windowRect);
    SetCursorPos(
@@ -68,7 +70,7 @@ void Input::OnEndFrame() {
    // );
 }
 
-bool Input::WndProc(HWND windowHandle, UINT msg, WPARAM wParam, LPARAM lParam, LRESULT* lResult) {
+bool Input::WndProc(HWND windowHandle, UINT msg, WPARAM wParam, LPARAM lParam, LRESULT* lResult) {   
    switch(msg) {
       case WM_INPUT: {
          UINT rawInputDataSize = sizeof(m_rawInputData);
@@ -97,6 +99,9 @@ bool Input::WndProc(HWND windowHandle, UINT msg, WPARAM wParam, LPARAM lParam, L
 }
 
 void Input::_ProcessInput() {
+   if (!Engine::Get().IsWindowSelected())
+      return;
+
    if (m_rawInputData.header.dwType == RIM_TYPEMOUSE) {
       if (m_rawInputData.data.mouse.usFlags == MOUSE_MOVE_RELATIVE) {
          m_mouseMove.x += m_rawInputData.data.mouse.lLastX;

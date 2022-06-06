@@ -1,14 +1,10 @@
 #pragma once
 #include "KsiMain.hpp"
 
-#include "Allocator.hpp"
-
 KSI_START
 
-template <class _Ty, class _Allocator = BasicAllocator>
+template <class _Ty>
 class Array {
-   static_assert(is_allocator<_Allocator>::value, "Template argument '_Allocator' is required to be an allocator");
-
 public:
    Array()
       : m_items(nullptr), m_reserved(10), m_count(0)
@@ -47,7 +43,6 @@ public:
    }
 
 private:
-   _Allocator m_allocator;
    size_t m_reserved;
    size_t m_count;
    _Ty* m_items;
@@ -72,6 +67,12 @@ public:
       m_count = 0;
    }
 
+   size_t find(const _Ty& v) {
+      for (size_t i = 0; i < m_count; i++)
+         if (m_items[i] == v) return i;
+      return -1;
+   }
+
    _Ty* begin() { return m_items; }
    _Ty* end() { return m_items + m_count; }
 
@@ -82,18 +83,22 @@ public:
 
 private:
    void _free() {
-      if (m_items)
-         m_allocator.free(m_items), m_items = nullptr;
+      if (m_items) {
+         _SafeDelete(m_items);
+      }
       m_count = 0;
    }
    void _realloc() {
       if (m_reserved == 0)
          _free();
       else {
-         if (m_items)
-            m_items = (_Ty*) m_allocator.realloc(m_items, m_reserved * sizeof(_Ty));
-         else
-            m_items = (_Ty*) m_allocator.alloc(m_reserved * sizeof(_Ty));
+         if (m_items) {
+            _Ty* temp = new _Ty[m_reserved];
+            memcpy(temp, m_items, m_count * sizeof(_Ty));
+            delete[] m_items;
+            m_items = temp;
+         } else
+            m_items = new _Ty[m_reserved];
       }
    }
 };

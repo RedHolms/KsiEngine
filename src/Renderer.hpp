@@ -12,8 +12,15 @@ KSI_RENDER_START
 
 struct Vertex {
    Vector3 pos;
-   Vector3 color;
+   Vector3 norm;
    Vector2 textureUV;
+
+   inline bool operator==(const Vertex& other) {
+      return
+         pos == other.pos &&
+         norm == other.norm &&
+         textureUV == other.textureUV;
+   }
 };
 
 struct DrawObject {

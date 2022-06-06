@@ -31,10 +31,12 @@
 #define _KSI KsiEngine
 #define _KSI_RENDER Render
 #define _KSI_MATH Math
+#define _KSI_NC NC
 
 #define _KSI_ ::_KSI
 #define _KSI_RENDER_ _KSI_::_KSI_RENDER
 #define _KSI_MATH_ _KSI_::_KSI_MATH
+#define _KSI_NC_ _KSI_::_KSI_NC
 
 #define KSI_START namespace _KSI {
 #define KSI_END }
@@ -44,6 +46,9 @@
 
 #define KSI_MATH_START KSI_START namespace _KSI_MATH {
 #define KSI_MATH_END } KSI_END
+
+#define KSI_NC_START KSI_START namespace _KSI_NC {
+#define KSI_NC_END } KSI_END
 
 #if defined(_MSC_BUILD)
    #define KsiInterface __interface

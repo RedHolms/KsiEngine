@@ -3,6 +3,7 @@ setlocal
 
 @REM Available flags:
 @REM  -s    Build a static lib
+@REM  -d    Build a debug version
 
 set KSI_LIB_DIR=%cd%\lib
 set KSI_BIN_DIR=%cd%\bin
@@ -16,15 +17,17 @@ set KSI_CC_FLAGS= /DKSI_BUILD /O2
 set KSI_LK_FLAGS= /DLL
 set KSI_LB_FLAGS=
 
+set KSI_OBJ_EXT=o
+
 :: without extensions
 set KSI_SOURCES=^
-   Allocator ^
    Camera ^
    Mesh ^
    GameObject ^
    Renderer ^
    Input ^
    Texture ^
+   ObjReader ^
    Engine
 
 :: with extensions
@@ -39,7 +42,7 @@ for %%a in (%*) do (
    ) else if "%%a"=="-d"   ( set KSI_DEBUG=1
    ) else (
       if "%%a"=="all" if exist %KSI_OBJ_DIR% rmdir /S /Q %KSI_OBJ_DIR%
-      if exist %KSI_OBJ_DIR%\%%a.obj del %KSI_OBJ_DIR%\%%a.obj
+      if exist %KSI_OBJ_DIR%\%%a.%KSI_OBJ_EXT% del %KSI_OBJ_DIR%\%%a.%KSI_OBJ_EXT%
       if exist %KSI_OBJ_DIR%\%%a.cso del %KSI_OBJ_DIR%\%%a.cso
       if exist %KSI_OBJ_DIR%\%%a del %KSI_OBJ_DIR%\%%a
    )
@@ -52,6 +55,10 @@ set KSI_LK_=link /nologo
 set KSI_LB_=lib /nologo
 
 if defined KSI_STATIC set KSI_CC_FLAGS=%KSI_CC_FLAGS% /DKSI_STATIC
+if defined KSI_DEBUG (
+   set KSI_LK_FLAGS=%KSI_LK_FLAGS% /DEBUG
+   set KSI_CC_FLAGS=%KSI_CC_FLAGS% /DKSI_DEBUG /Zi
+)
 
 set KSI_CC=%KSI_CC_%%KSI_CC_FLAGS%
 set KSI_LK=%KSI_LK_%%KSI_LK_FLAGS%%KSI_LIBS%
@@ -73,29 +80,32 @@ if not exist %KSI_OBJ_DIR%\pixel.cso   fxc /nologo /T ps_5_0 pixel.hlsl /Fo:%KSI
 if not exist %KSI_OBJ_DIR%\vertex.cso  fxc /nologo /T vs_5_0 vertex.hlsl /Fo:%KSI_OBJ_DIR%\vertex.cso
 
 for %%f in (%KSI_SOURCES%) do (
-   if not exist %KSI_OBJ_DIR%\%%f.obj %KSI_CC% /Fo:%KSI_OBJ_DIR%\%%f.obj %%f.cpp
+   if not exist %KSI_OBJ_DIR%\%%f.%KSI_OBJ_EXT% %KSI_CC% /Fo:%KSI_OBJ_DIR%\%%f.%KSI_OBJ_EXT% %%f.cpp
    if errorlevel 1 (
       echo.
       echo Compile error
       exit /b 1
    )
 )
+
+if exist *.pdb move *.pdb %KSI_OBJ_DIR%
 popd
 
 if defined KSI_STATIC (
-   %KSI_LB% %KSI_OBJ_DIR%\*.obj /out:%KSI_LIB_DIR%\ksiEngine.lib
+   %KSI_LB% %KSI_OBJ_DIR%\*.%KSI_OBJ_EXT% /out:%KSI_LIB_DIR%\ksiEngine.lib
    if errorlevel 1 (
       echo.
       echo Link error
       exit /b 1
    )
 ) else (
-   %KSI_LK% %KSI_OBJ_DIR%\*.obj /out:%KSI_BIN_DIR%\ksiEngine.dll /implib:%KSI_LIB_DIR%\ksiEngine.lib
+   %KSI_LK% %KSI_OBJ_DIR%\*.%KSI_OBJ_EXT% /out:%KSI_BIN_DIR%\ksiEngine.dll /implib:%KSI_LIB_DIR%\ksiEngine.lib
    if errorlevel 1 (
       echo.
       echo Link error
       exit /b 1
    )
 )
+if exist %KSI_OBJ_DIR%\*.pdb copy %KSI_OBJ_DIR%\*.pdb %KSI_LIB_DIR%
 
 endlocal

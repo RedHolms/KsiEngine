@@ -48,8 +48,9 @@ public:
 
    float GetDeltaTime() { return m_deltaTime; }
 
-   KSI_API void AddGameObject(GameObject* obj);
+   KSI_API bool IsWindowSelected();
 
+   KSI_API void AddGameObject(GameObject* obj);
    KSI_API void AddScript(GameScript* scr);
 
    KSI_API int Run();

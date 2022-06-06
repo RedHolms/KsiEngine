@@ -1,5 +1,4 @@
 struct InputData {
-   float4 color : COLOR;
    float2 uv : TEXCOORD;
 };
 

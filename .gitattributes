@@ -1,1 +1,4 @@
+# objects should use LF lines engings
+*.obj text eol=lf
+
 * text=auto

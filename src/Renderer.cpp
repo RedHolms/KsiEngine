@@ -1,6 +1,6 @@
 #include "Renderer.hpp"
 
-#include <stdio.h> // snprintf
+#include <stdio.h>
 
 #include <windows.h>
 #include <DirectXColors.h>
@@ -130,6 +130,7 @@ Renderer::Renderer(HWND windowHandle)
       m_device->CreateRasterizerState(&rasterizerDesc, &m_rasterizerState)
    );
 
+   /* Create sampler state */
    D3D11_SAMPLER_DESC samplerDesc;
    _ClearStructure(samplerDesc);
    samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
@@ -186,7 +187,7 @@ Renderer::Renderer(HWND windowHandle)
    /* Create input layout */
    D3D11_INPUT_ELEMENT_DESC inputLayoutDesc[] = {
       { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, _MemberOffset(Vertex, pos), D3D11_INPUT_PER_VERTEX_DATA, 0 },
-      { "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, _MemberOffset(Vertex, color), D3D11_INPUT_PER_VERTEX_DATA, 0 },
+      { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, _MemberOffset(Vertex, norm), D3D11_INPUT_PER_VERTEX_DATA, 0 },
       { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, _MemberOffset(Vertex, textureUV), D3D11_INPUT_PER_VERTEX_DATA, 0}
    };
 
@@ -269,7 +270,6 @@ void Renderer::Present() {
 
 KSI_RENDER_END
 
-// Defined in KsiMain.hpp
 void DirectXAssertImpl(HRESULT hr, const char* expr, const char* file, uint32_t line) {
    if (FAILED(hr)) {
       static char errorBuff[512];

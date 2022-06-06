@@ -1,13 +1,20 @@
 # IDE config
 .vscode
 
+# Debuger config
+.vs
+
 # Build output
-*.obj
+*.o
 *.exe
 *.dll
 *.lib
 *.exp
 *.cso
+
+# Debug files
+*.pdb
+*.ilk
 
 # Output folders
 lib

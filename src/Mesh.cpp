@@ -1,5 +1,7 @@
 #include "Mesh.hpp"
 
+#include <stdio.h>
+
 #include "ObjReader.hpp"
 #include "Renderer.hpp"
 #include "Engine.hpp"
@@ -21,11 +23,11 @@ Mesh::~Mesh() {
 }
 
 void Mesh::UpdateBuffers() {
-   ID3D11Device* d3ddevice = Engine::Get().GetRenderer()->GetDevice();
+   ID3D11Device1* d3ddevice = Engine::Get().GetRenderer()->GetDevice();
 
    _SafeRelease(m_vertices);
    _SafeRelease(m_indices);
-
+   
    D3D11_SUBRESOURCE_DATA subresourceData;
    _ClearStructure(subresourceData);
 
@@ -176,7 +178,7 @@ Mesh Mesh::CreateFromFile(const char* filename) {
    Array<_KSI_RENDER_::Vertex> vertices;
    Array<uint16_t> indices;
 
-   for (size_t i = 0; i < r.faces.count(); i++) {
+   for (int i = r.faces.count() - 1; i >= 0; i--) {
       _KSI_NC_::ObjFace& face = r.faces[i];
 
       _KSI_NC_::ObjV v = r.vertices[face.vertexIdx];

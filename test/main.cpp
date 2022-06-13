@@ -47,7 +47,7 @@ public:
       KsiEngine::Vector3 cameraMove;
       KsiEngine::Vector3 cameraRot = KsiEngine::Vector3(0.0f, mouseMoveVec.x, -mouseMoveVec.y);
 
-      m_cube->GetRotation() += KsiEngine::Vector3(80.0f * deltaTime, 80.0f * deltaTime, 80.0f * deltaTime);
+      // m_cube->GetRotation() += KsiEngine::Vector3(80.0f * deltaTime, 80.0f * deltaTime, 80.0f * deltaTime);
       
       if (input->IsKeyDown('W'))
          cameraMove += cameraForward * CameraMoveSpeed * deltaTime;
@@ -75,8 +75,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, PSTR, int) {
 
    KsiEngine::Engine& eng = KsiEngine::Engine::Get();
 
-   MainScript scr;
-   eng.AddScript(&scr);
+   MainScript* scr = new MainScript;
+   eng.AddScript(scr);
 
    int status = eng.Run();
    KsiEngine::Engine::Destroy();

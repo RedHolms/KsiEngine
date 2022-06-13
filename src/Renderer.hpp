@@ -4,7 +4,7 @@
 #include <windows.h>
 #include <DirectXMath.h>
 #include <d3dcompiler.h>
-#include <d3d11.h>
+#include <d3d11_1.h>
 
 #include "Vector.hpp"
 
@@ -51,9 +51,9 @@ private:
 
    D3D_FEATURE_LEVEL m_featureLevel;
 
-   ID3D11Device* m_device;
-   ID3D11DeviceContext* m_deviceContext;
-   IDXGISwapChain* m_swapChain;
+   ID3D11Device1* m_device;
+   ID3D11DeviceContext1* m_deviceContext;
+   IDXGISwapChain1* m_swapChain;
    ID3D11RenderTargetView* m_renderTargetView;
    ID3D11Texture2D* m_depthStencilBuffer;
    ID3D11DepthStencilView* m_depthStencilView;
@@ -70,7 +70,7 @@ private:
    D3D11_VIEWPORT m_viewport;
 
 public:
-   ID3D11Device* GetDevice() { return m_device; }
+   ID3D11Device1* GetDevice() { return m_device; }
 
    KSI_API void UpdateConstantBuffer(const ConstantBufferData* data);
 

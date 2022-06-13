@@ -30,27 +30,17 @@ Renderer::Renderer(HWND windowHandle)
    GetClientRect(m_windowHandle, &clientRect);
 
    /* Create device, device context and swap chain */
-   DXGI_SWAP_CHAIN_DESC swapChainDesc;
-   _ClearStructure(swapChainDesc);
-   swapChainDesc.BufferCount = 1;
-   swapChainDesc.BufferDesc.Width = _RectWidth(clientRect);
-   swapChainDesc.BufferDesc.Height = _RectHeight(clientRect);
-   swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-   swapChainDesc.BufferDesc.RefreshRate.Numerator = 60;
-   swapChainDesc.BufferDesc.RefreshRate.Denominator = 1;
-   swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-   swapChainDesc.OutputWindow = m_windowHandle;
-   swapChainDesc.SampleDesc.Count = 1;
-   swapChainDesc.SampleDesc.Quality = 0;
-   swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-   swapChainDesc.Windowed = TRUE;
+   
 
    D3D_FEATURE_LEVEL featureLevels[] = {
       D3D_FEATURE_LEVEL_11_0
    };
 
+   ID3D11Device* baseDevice;
+   ID3D11DeviceContext* baseDeviceContext;
+   IDXGISwapChain* baseSwapChain;
    DirectXAssert(
-      D3D11CreateDeviceAndSwapChain(
+      D3D11CreateDevice(
          nullptr,
          D3D_DRIVER_TYPE_HARDWARE,
          NULL,
@@ -58,15 +48,59 @@ Renderer::Renderer(HWND windowHandle)
          featureLevels,
          _ConstArraySize(featureLevels),
          D3D11_SDK_VERSION,
-         &swapChainDesc,
-         &m_swapChain,
-         &m_device,
+         &baseDevice,
          &m_featureLevel,
-         &m_deviceContext
+         &baseDeviceContext
       )
    );
 
-   HRESULT hr;
+   DirectXAssert(
+      baseDevice->QueryInterface(__uuidof(ID3D11Device1), (void**)&m_device)
+   );
+   baseDevice->Release();
+
+   DirectXAssert(
+      baseDeviceContext->QueryInterface(__uuidof(ID3D11DeviceContext1), (void**)&m_deviceContext)
+   );
+   baseDeviceContext->Release();
+
+   IDXGIFactory2* dxgiFactory;
+   {
+      IDXGIDevice1* dxgiDevice;
+      HRESULT hResult = m_device->QueryInterface(__uuidof(IDXGIDevice1), (void**)&dxgiDevice);
+      assert(SUCCEEDED(hResult));
+
+      IDXGIAdapter* dxgiAdapter;
+      hResult = dxgiDevice->GetAdapter(&dxgiAdapter);
+      assert(SUCCEEDED(hResult));
+      dxgiDevice->Release();
+
+      DXGI_ADAPTER_DESC adapterDesc;
+      dxgiAdapter->GetDesc(&adapterDesc);
+
+      hResult = dxgiAdapter->GetParent(__uuidof(IDXGIFactory2), (void**)&dxgiFactory);
+      assert(SUCCEEDED(hResult));
+      dxgiAdapter->Release();
+   }
+
+   DXGI_SWAP_CHAIN_DESC1 swapChainDesc;
+   _ClearStructure(swapChainDesc);
+   swapChainDesc.BufferCount = 1;
+   swapChainDesc.Width = _RectWidth(clientRect);
+   swapChainDesc.Height = _RectHeight(clientRect);
+   swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+   swapChainDesc.SampleDesc.Count = 1;
+   swapChainDesc.SampleDesc.Quality = 0;
+   swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+   swapChainDesc.BufferCount = 2;
+   swapChainDesc.Scaling = DXGI_SCALING_STRETCH;
+   swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+   swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
+
+   HRESULT hResult = dxgiFactory->CreateSwapChainForHwnd(m_device, m_windowHandle, &swapChainDesc, 0, 0, &m_swapChain);
+   assert(SUCCEEDED(hResult));
+
+   dxgiFactory->Release();
 
    /* Create render targer view */
    ID3D11Texture2D* backBuffer = nullptr;
@@ -80,17 +114,12 @@ Renderer::Renderer(HWND windowHandle)
 
    /* Create depth stencil view */
    D3D11_TEXTURE2D_DESC depthStencilBufferDesc;
-   _ClearStructure(depthStencilBufferDesc);
-   depthStencilBufferDesc.ArraySize = 1;
-   depthStencilBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-   depthStencilBufferDesc.CPUAccessFlags = 0;
+   backBuffer->GetDesc(&depthStencilBufferDesc);
+
+   backBuffer->Release();
+
    depthStencilBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-   depthStencilBufferDesc.Width = _RectWidth(clientRect);
-   depthStencilBufferDesc.Height = _RectHeight(clientRect);
-   depthStencilBufferDesc.MipLevels = 1;
-   depthStencilBufferDesc.SampleDesc.Count = 1;
-   depthStencilBufferDesc.SampleDesc.Quality = 0;
-   depthStencilBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+   depthStencilBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 
    DirectXAssert(
       m_device->CreateTexture2D(&depthStencilBufferDesc, nullptr, &m_depthStencilBuffer)
@@ -106,7 +135,6 @@ Renderer::Renderer(HWND windowHandle)
    depthStencilStateDesc.DepthEnable = TRUE;
    depthStencilStateDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
    depthStencilStateDesc.DepthFunc = D3D11_COMPARISON_LESS;
-   depthStencilStateDesc.StencilEnable = FALSE;
 
    DirectXAssert(
       m_device->CreateDepthStencilState(&depthStencilStateDesc, &m_depthStencilState)
@@ -115,16 +143,9 @@ Renderer::Renderer(HWND windowHandle)
    /* Create rasterizer state */
    D3D11_RASTERIZER_DESC rasterizerDesc;
    _ClearStructure(rasterizerDesc);
-   rasterizerDesc.AntialiasedLineEnable = FALSE;
-   rasterizerDesc.CullMode = D3D11_CULL_BACK;
-   rasterizerDesc.DepthBias = 0;
-   rasterizerDesc.DepthBiasClamp = 0.0f;
-   rasterizerDesc.DepthClipEnable = TRUE;
    rasterizerDesc.FillMode = D3D11_FILL_SOLID;
-   rasterizerDesc.FrontCounterClockwise = FALSE;
-   rasterizerDesc.MultisampleEnable = FALSE;
-   rasterizerDesc.ScissorEnable = FALSE;
-   rasterizerDesc.SlopeScaledDepthBias = 0.0f;
+   rasterizerDesc.CullMode = D3D11_CULL_BACK;
+   rasterizerDesc.FrontCounterClockwise = TRUE;
 
    DirectXAssert(
       m_device->CreateRasterizerState(&rasterizerDesc, &m_rasterizerState)
@@ -151,8 +172,7 @@ Renderer::Renderer(HWND windowHandle)
 
    /* Create constant buffer */
    D3D11_BUFFER_DESC constantBufferDesc;
-   ZeroMemory( &constantBufferDesc, sizeof(D3D11_BUFFER_DESC) );
-
+   _ClearStructure(constantBufferDesc);
    constantBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
    constantBufferDesc.ByteWidth = sizeof(ConstantBufferData);
    constantBufferDesc.CPUAccessFlags = 0;
@@ -186,9 +206,9 @@ Renderer::Renderer(HWND windowHandle)
 
    /* Create input layout */
    D3D11_INPUT_ELEMENT_DESC inputLayoutDesc[] = {
-      { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, _MemberOffset(Vertex, pos), D3D11_INPUT_PER_VERTEX_DATA, 0 },
-      { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, _MemberOffset(Vertex, norm), D3D11_INPUT_PER_VERTEX_DATA, 0 },
-      { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, _MemberOffset(Vertex, textureUV), D3D11_INPUT_PER_VERTEX_DATA, 0}
+      { "POSITION",  0, DXGI_FORMAT_R32G32B32_FLOAT,  0, 0,                            D3D11_INPUT_PER_VERTEX_DATA, 0 },
+      { "NORMAL",    0, DXGI_FORMAT_R32G32B32_FLOAT,  0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+      { "TEXCOORD",  0, DXGI_FORMAT_R32G32_FLOAT,     0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
    };
 
    DirectXAssert(
